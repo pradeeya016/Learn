@@ -1,0 +1,43 @@
+name: CI/CD Pipeline for Flask App
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    # The runner environment (an Ubuntu virtual machine)
+    runs-on: ubuntu-latest
+    steps:
+    # Step 1: Check out the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Podman
+        uses: redhat-actions/podman-login@v1
+
+      # Step 3: Log in to a container registry
+      # This step uses secrets you'll configure in your GitHub repository
+      - name: Log in to docker Container Registry
+        uses: redhat-actions/podman-login@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME  }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          registry: ghcr.io
+
+      - name: Build and tag the image
+        id: build-image
+        run: |
+          # The image name now includes your Docker Hub username
+          IMAGE_ID=${{ secrets.DOCKER_HUB_USERNAME }}/flask-app
+          VERSION=$(echo ${{ github.sha }} | cut -c1-8)
+          podman build -t $IMAGE_ID:$VERSION .
+          podman tag $IMAGE_ID:$VERSION $IMAGE_ID:latest
+          echo "IMAGE_ID=$IMAGE_ID" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          
+      # Step 5: Push the image to Docker Hub
+      - name: Push the image
+        run: |
+          podman push ${{ env.IMAGE_ID }}:${{ env.VERSION }}
+          podman push ${{ env.IMAGE_ID }}:latest
