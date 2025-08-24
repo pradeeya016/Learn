@@ -23,7 +23,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME  }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
-          registry: ghcr.io
+          registry: docker.io
 
       - name: Build and tag the image
         id: build-image
@@ -35,7 +35,7 @@ jobs:
           podman tag $IMAGE_ID:$VERSION $IMAGE_ID:latest
           echo "IMAGE_ID=$IMAGE_ID" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          
+
       # Step 5: Push the image to Docker Hub
       - name: Push the image
         run: |
