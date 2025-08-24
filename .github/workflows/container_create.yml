@@ -3,15 +3,19 @@ name: CI/CD Pipeline for Flask App
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     
+    permissions:
+      contents: read
+      packages: write
+      
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
