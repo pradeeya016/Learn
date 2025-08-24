@@ -3,10 +3,10 @@ name: CI/CD Pipeline for Flask App
 on:
   push:
     branches:
-      - main
+      - Master
   pull_request:
     branches:
-      - main
+      - Master
 
 jobs:
   build-and-deploy:
